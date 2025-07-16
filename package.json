@@ -1,0 +1,45 @@
+{
+  "name": "@enymo/react-resource-hook-expo-sqlite",
+  "version": "0.0.0",
+  "description": "Expo SQLite adapter for the react resource hook",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.ts"
+      },
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "tsup": {
+    "entry": [
+      "src/js/index.ts"
+    ],
+    "format": [
+      "esm",
+      "cjs"
+    ],
+    "dts": true
+  },
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enymo/react-resource-hook-expo-sqlite.git"
+  },
+  "author": "enymo GmbH",
+  "license": "MIT",
+  "devDependencies": {
+    "postcss": "^8.5.6",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}
