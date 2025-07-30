@@ -25,7 +25,7 @@ async function migrateDb(db: SQLiteDatabase) {
             await db.execAsync(`
                 CREATE TABLE resources (
                     resource TEXT NOT NULL,
-                    key TEXT NOT NULL,
+                    key TEXT NULL,
                     target TEXT NOT NULL,
                     id TEXT NOT NULL,
                     data TEXT NULL,
@@ -53,7 +53,7 @@ export default function createExpoSQLiteResourceAdapter({}: {}): CacheResourceBa
     return (resource, {}, cache) => ({
         actionHook: ({}, params) => {
             const db = useSQLiteContext();
-            const key = JSON.stringify(params);
+            const key = JSON.stringify(params) ?? "";
 
             return {
                 store: async data => {
@@ -239,8 +239,9 @@ export default function createExpoSQLiteResourceAdapter({}: {}): CacheResourceBa
                     }>;
 
                     const data = await db.getAllAsync<DatabaseResource>(
-                        "SELECT * FROM resources WHERE resource = ?",
-                        resource
+                        "SELECT * FROM resources WHERE resource = ? AND key = ?",
+                        resource,
+                        key
                     );
 
                     for (const entry of data) {
@@ -261,10 +262,10 @@ export default function createExpoSQLiteResourceAdapter({}: {}): CacheResourceBa
                 },
                 sync: async (...ids) => {
                     await db.runAsync(
-                        "DELETE FROM resources WHERE resource = ? AND key = ? AND target = 'remote' AND id IN ?",
+                        `DELETE FROM resources WHERE resource = ? AND key = ? AND target = 'remote' AND id IN (${Array(ids.length).fill("?").join(",")})`,
                         resource,
                         key,
-                        `(${ids.map(id => JSON.stringify(id)).join(",")})`
+                        ...ids.map(id => JSON.stringify(id))
                     )
                 },
                 addOfflineListener: () => () => undefined
