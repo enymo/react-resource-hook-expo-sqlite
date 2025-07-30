@@ -44,7 +44,7 @@
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "@enymo/react-resource-hook": "^6.0.0-beta.0",
+    "@enymo/react-resource-hook": "^6.0.0-beta.1",
     "expo-sqlite": "^15.2.14",
     "react": ">=17.0.0"
   }
