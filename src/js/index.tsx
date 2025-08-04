@@ -1,6 +1,7 @@
+import { createRequiredContext } from "@enymo/react-better-context";
 import { CacheResourceBackendAdapter, Resource } from "@enymo/react-resource-hook";
-import { SQLiteDatabase, SQLiteProvider, useSQLiteContext } from "expo-sqlite";
-import { ReactNode } from "react";
+import { openDatabaseAsync, SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface DatabaseResource {
     resource: string,
@@ -38,14 +39,41 @@ async function migrateDb(db: SQLiteDatabase) {
     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
 }
 
-export function ExpoSQLiteResourceProvider({databaseName, children}: {
+const [Provider, useContext] = createRequiredContext<SQLiteDatabase>("ExpoSQLiteResourceProvider must be present in component tree");
+
+export function ExpoSQLiteResourceProvider({databaseName, fallback = null, children}: {
     databaseName: string,
+    fallback?: ReactNode,
     children: ReactNode
 }) {
+    const [db, setDb] = useState<SQLiteDatabase>();
+    const dbRef = useRef<SQLiteDatabase>(undefined);
+
+    useEffect(() => {
+        const abortController = new AbortController;
+        openDatabaseAsync(databaseName)
+            .then(db => migrateDb(db).then(() => db))
+            .then(db => {
+                if (abortController.signal.aborted) {
+                    db.closeAsync();
+                }
+                else {
+                    dbRef.current = db;
+                    setDb(db);
+                }
+            });
+        return () => {
+            abortController.abort();
+            dbRef.current?.closeAsync();
+        }
+    }, [setDb, dbRef]);
+
+    if (db === undefined) return fallback;
+
     return (
-        <SQLiteProvider databaseName={databaseName} onInit={migrateDb}>
+        <Provider value={db}>
             {children}
-        </SQLiteProvider>
+        </Provider>
     )
 }
 
