@@ -49,6 +49,7 @@
     "react": ">=17.0.0"
   },
   "dependencies": {
-    "@enymo/react-better-context": "^1.0.1"
+    "@enymo/react-better-context": "^1.0.1",
+    "@enymo/react-resource-hook-util": "^1.0.0"
   }
 }
