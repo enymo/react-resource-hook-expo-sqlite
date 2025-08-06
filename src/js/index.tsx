@@ -78,11 +78,17 @@ export function ExpoSQLiteResourceProvider({databaseName, fallback = null, child
     )
 }
 
-export default function createExpoSQLiteResourceAdapter({}: {}): CacheResourceBackendAdapter<{
+export type ExpoSQLiteResourceConfig = {
     transformer?: (item: any) => Promise<any> | any,
     inverseTransformer?: (item: any) => Promise<any> | any,
     transformDates?: boolean
-}, {}, never> {
+}
+
+export type ExpoSQLiteUseConfig = {}
+
+export type ExpoSQLiteRequestConfig = never
+
+export default function createExpoSQLiteResourceAdapter({}: {}): CacheResourceBackendAdapter<ExpoSQLiteResourceConfig, ExpoSQLiteUseConfig, ExpoSQLiteRequestConfig> {
     return (resource, {
         transformer: baseTransformer = identity,
         inverseTransformer: baseInverseTransformer = identity,
